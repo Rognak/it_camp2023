@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  pvt:
+    build:
+      dockerfile: ./docker/pvt.Dockerfile
+    ports:
+      - "8001:8001"
+  vlp:
+    build:
+      dockerfile: ./docker/vlp.Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      PVT_HOST: pvt
+  ipr:
+    build:
+      dockerfile: ./docker/ipr.Dockerfile
+    ports:
+      - "8002:8002"
+  nodal_analysis:
+    build:
+      dockerfile: ./docker/nodal.Dockerfile
+    ports:
+      - "8003:8003"
+  aggregate:
+    build:
+      dockerfile: ./docker/aggregate.Dockerfile
+    ports:
+      - "8004:8004"
+    depends_on: [ipr, vlp, pvt, nodal_analysis]
+    environment:
+      VLP_HOST: vlp
+      IPR_HOST: ipr
+      NODAL_HOST: nodal_analysis

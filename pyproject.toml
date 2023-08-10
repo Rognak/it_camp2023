@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "it-camp2023"
+version = "0.1.0"
+description = ""
+authors = ["Харицкий Данил Константинович <Khlive.ftf@gmail.com>"]
+readme = "README.md"
+packages = [{include = "it_camp2023"}]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+fastapi = {extras = ["all"], version = "^0.101.0"}
+scipy = "^1.11.1"
+httpx = "^0.24.1"
+shapely = "^2.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

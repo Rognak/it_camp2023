@@ -17,12 +17,12 @@ class NodalCalcRequest(BaseModel):
             "example": {
                 "vlp": {
                     "q_liq": [0, 30, 60, 90, 120, 150],
-                    "p_wf": [200, 190, 180, 175, 185, 200]
+                    "p_wf": [200, 190, 180, 175, 185, 200],
                 },
                 "ipr": {
                     "q_liq": [0, 30, 60, 90, 120, 150],
-                    "p_wf": [200, 180, 160, 140, 120, 100]
-                }
+                    "p_wf": [200, 180, 160, 140, 120, 100],
+                },
             }
         }
     }
@@ -40,8 +40,4 @@ class NodalCalcDecision(BaseModel):
 class NodalCalcResponse(RootModel):
     root: List[NodalCalcDecision]
 
-    model_config = {
-        "json_schema_extra": {
-            "example": [{"p_wf": 200, "q_liq": 0}]
-        }
-    }
+    model_config = {"json_schema_extra": {"example": [{"p_wf": 200, "q_liq": 0}]}}

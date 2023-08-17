@@ -11,8 +11,7 @@ class IprCalcRequest(BaseModel):
 
 
 class Inclinometry(BaseModel):
-    MD: conlist(
-        item_type=float) = Field(title="Измеренная по стволу глубина, м")
+    MD: conlist(item_type=float) = Field(title="Измеренная по стволу глубина, м")
     TVD: List[float] = Field(title="Вертикальная глубина, м")
 
 
@@ -64,17 +63,9 @@ class WellModelCalcRequest(VlpCalcRequest):
     model_config = {
         "json_schema_extra": {
             "example": {
-                "inclinometry": {
-                    "MD": [0, 1000, 1500],
-                    "TVD": [0, 1000, 1100]
-                },
-                "casing": {
-                    "d": 0.1
-                },
-                "tubing": {
-                    "d": 0.062,
-                    "h_mes": 1000
-                },
+                "inclinometry": {"MD": [0, 1000, 1500], "TVD": [0, 1000, 1100]},
+                "casing": {"d": 0.1},
+                "tubing": {"d": 0.062, "h_mes": 1000},
                 "pvt": {
                     "wct": 50,
                     "rp": 100,
@@ -82,13 +73,13 @@ class WellModelCalcRequest(VlpCalcRequest):
                     "gamma_gas": 0.7,
                     "gamma_wat": 1,
                     "t_res": 90,
-                    "pb": 150
+                    "pb": 150,
                 },
                 "p_wh": 10,
                 "geo_grad": 3,
                 "h_res": 1500,
                 "p_res": 200,
-                "pi": 1
+                "pi": 1,
             }
         }
     }
@@ -120,19 +111,13 @@ class WellModelCalcResponse(NodalCalcRequest):
             "example": {
                 "vlp": {
                     "q_liq": [0, 30, 60, 90, 120, 150],
-                    "p_wf": [200, 190, 180, 175, 185, 200]
+                    "p_wf": [200, 190, 180, 175, 185, 200],
                 },
                 "ipr": {
                     "q_liq": [0, 30, 60, 90, 120, 150],
-                    "p_wf": [200, 180, 160, 140, 120, 100]
+                    "p_wf": [200, 180, 160, 140, 120, 100],
                 },
-                "nodal": [{
-                    "p_wf": 150,
-                    "q_liq": 100
-                }, {
-                    "p_wf": 160,
-                    "q_liq": 90
-                }]
+                "nodal": [{"p_wf": 150, "q_liq": 100}, {"p_wf": 160, "q_liq": 90}],
             }
         }
     }

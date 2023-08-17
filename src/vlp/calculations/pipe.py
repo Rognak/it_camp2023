@@ -9,7 +9,17 @@ from scipy.interpolate import interp1d
 import httpx
 
 
-def calc_pipe(d, h0, h1, incl, temp_grad, pvt, p_in, tvd_res, qliq):
+def calc_pipe(
+        d,
+        h0,
+        h1,
+        incl,
+        temp_grad,
+        pvt,
+        p_in,
+        tvd_res,
+        qliq,
+):
     """
     Расчёт давления на участке трубы
 
@@ -31,7 +41,8 @@ def calc_pipe(d, h0, h1, incl, temp_grad, pvt, p_in, tvd_res, qliq):
             t_span=(h0, h1),
             y0=[p_in, temp_func(temp_grad, pvt["t_res"], tvd_res, tvd_cur)],
             method="RK23",
-            args=(d, temp_grad, pvt, incl, qliq, client))
+            args=(d, temp_grad, pvt, incl, qliq, client),
+        )
 
     return result.y[0][-1]
 
@@ -45,8 +56,9 @@ def _calc_sin_angle(incl, md1: float, md2: float) -> float:
     :param md2: measured depth 2, м
     :return: синус угла к горизонтали
     """
-    return (0 if md2 == md1 else min(
-        (incl(md2).item() - incl(md1).item()) / (md2 - md1), 1))
+    return (
+        0 if md2 == md1 else min((incl(md2).item() - incl(md1).item()) / (md2 - md1), 1)
+    )
 
 
 def _calc_angle(incl, md1: float, md2: float) -> float:
@@ -58,8 +70,11 @@ def _calc_angle(incl, md1: float, md2: float) -> float:
     :param md2: measured depth 2, м
     :return: угол к горизонтали, град
     """
-    return (np.degrees(np.arcsin(_calc_sin_angle(incl, md1, md1 + 0.001)))
-            if md2 == md1 else np.degrees(np.arcsin(_calc_sin_angle(incl, md1, md2))))
+    return (
+        np.degrees(np.arcsin(_calc_sin_angle(incl, md1, md1 + 0.001)))
+        if md2 == md1
+        else np.degrees(np.arcsin(_calc_sin_angle(incl, md1, md2)))
+    )
 
 
 def _grav_gradient(rho_mix, theta_deg):
@@ -67,11 +82,11 @@ def _grav_gradient(rho_mix, theta_deg):
 
 
 def _fric_gradient(ff, rho_mix, vsm, d):
-    return ff * rho_mix * vsm ** 2 / (2 * d)
+    return ff * rho_mix * vsm**2 / (2 * d)
 
 
 def _calc_vm(qm, d):
-    return qm / (mt.pi * d ** 2 / 4)
+    return qm / (mt.pi * d**2 / 4)
 
 
 def _calc_grad(h, pt, d, geotemp_grad, pvt, incl, qliq, client):
@@ -90,7 +105,7 @@ def _calc_grad(h, pt, d, geotemp_grad, pvt, incl, qliq, client):
 
     r = client.post(f"http://{PVT_HOST}:8001/calculator", json=prms)
     r = json.loads(r.text)
-    qm, rhom, mum = r["QMix"], r['RhoMix'], r['MuMix']
+    qm, rhom, mum = r["QMix"], r["RhoMix"], r["MuMix"]
     vsm = _calc_vm(qm, d)
     n_re = _calc_n_re(d, rhom, vsm, mum)
 
@@ -123,20 +138,22 @@ def _calc_ff(n_re, eps):
     elif n_re < 2000:  # ламинарный поток
         f_n = 64 / n_re
     else:
-
         n_re_save = -1  # флаг для расчета переходного режима
         if n_re <= 4000:
             n_re_save = n_re
             n_re = 4000
 
         # расcчитываем турбулентный режим
-        f_n = (2 *
-               mt.log10(0.5405405405405405 * eps - 5.02 / n_re *
-                        mt.log10(0.5405405405405405 * eps + 13 / n_re))) ** -2
+        f_n = (
+            2
+            * mt.log10(
+                0.5405405405405405 * eps
+                - 5.02 / n_re * mt.log10(0.5405405405405405 * eps + 13 / n_re)
+            )
+        ) ** -2
         i = 0
         while True:
-            f_n_new = (1.74 - 2 * mt.log10(2 * eps + 18.7 /
-                                           (n_re * f_n ** 0.5))) ** -2
+            f_n_new = (1.74 - 2 * mt.log10(2 * eps + 18.7 / (n_re * f_n**0.5))) ** -2
             i = i + 1
             error = abs(f_n_new - f_n) / f_n_new
             f_n = f_n_new
@@ -149,8 +166,7 @@ def _calc_ff(n_re, eps):
             max_re = 4000
             f_turb = f_n
             f_lam = 0.032
-            f_n = f_lam + (n_re_save - min_re) * (f_turb - f_lam) / (max_re -
-                                                                     min_re)
+            f_n = f_lam + (n_re_save - min_re) * (f_turb - f_lam) / (max_re - min_re)
 
     return f_n
 
@@ -160,9 +176,7 @@ def incl_func(inclinometry_md: tuple, inclinometry_tvd: tuple):
     """
     Функция интерполяции инклинометрии
     """
-    return interp1d(inclinometry_md,
-                    inclinometry_tvd,
-                    fill_value='extrapolate')
+    return interp1d(inclinometry_md, inclinometry_tvd, fill_value="extrapolate")
 
 
 @lru_cache(maxsize=1024)
